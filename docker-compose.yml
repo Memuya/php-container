@@ -1,0 +1,9 @@
+services:
+  app:
+    container_name: php-container
+    build: .
+    volumes:
+      - .:/app
+    restart: unless-stopped
+    # environment:
+    #   - COMPOSER_ALLOW_SUPERUSER=1

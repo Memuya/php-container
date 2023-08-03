@@ -1,0 +1,25 @@
+{
+    "name": "memuya/container",
+    "description": "Example of a simple DIC.",
+    "type": "project",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Mehmet Uyanik",
+            "email": "mehmet.uyanik@live.com.au"
+        }
+    ],
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "autoload": {
+        "psr-4": {
+            "Memuya\\": "app/"
+        }
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^10.2"
+    },
+    "require": {
+        "psr/container": "^2.0"
+    }
+}
