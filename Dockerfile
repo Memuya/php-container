@@ -13,5 +13,5 @@ RUN apt-get update && apt-get -y install \
 # Using "RUN composer install" doesn't actually work properly because
 # the vendor directory is overwritten by our volume link which doesn't
 # always have the vendor directory existing.
-CMD bash -c "composer install && bash"
+CMD bash -c "composer install && php-fpm"
 # RUN composer install --no-interaction
