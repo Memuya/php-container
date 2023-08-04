@@ -54,9 +54,9 @@ class Container implements ContainerInterface, ArrayAccess
     /**
      * Return a single instance of the container.
      *
-     * @return ContainerInterface
+     * @return static
      */
-    public static function getInstance(): ContainerInterface
+    public static function getInstance(): static
     {
         if (! isset(static::$instance)) {
             return new static;
