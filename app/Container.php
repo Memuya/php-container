@@ -105,7 +105,7 @@ class Container implements ContainerInterface, ArrayAccess
         }
 
         return $reflection->newInstanceArgs(
-            $this->resolveDependenciesForClass($reflection, $arguments)
+            $this->resolveDependencies($reflection, $arguments)
         );
     }
 
@@ -118,7 +118,7 @@ class Container implements ContainerInterface, ArrayAccess
      * @param array<string, mixed> $arguments
      * @return array
      */
-    private function resolveDependenciesForClass(ReflectionClass $reflection, array $arguments = []): array
+    private function resolveDependencies(ReflectionClass $reflection, array $arguments = []): array
     {
         // If there's no contructor on the object then there are no dependencies to check.
         if (! $reflection->getConstructor()) {
