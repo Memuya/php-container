@@ -22,7 +22,7 @@ class Container implements ContainerInterface, ArrayAccess
     /**
      * The bindings in the container.
      *
-     * @var array<string, mixed>
+     * @var array<string, callable>
      */
     private array $bindings = [];
 
