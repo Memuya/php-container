@@ -116,4 +116,22 @@ final class ContainerTest extends TestCase
 
         $this->assertFalse(isset($container['id']));
     }
+
+    public function testCanBindAndResolveSingletonsFromContainer()
+    {
+        $testObj = new stdClass;
+        $testObj->prop = 'test';
+
+        $container = new Container;
+        $container->singleton('test', fn () => $testObj);
+
+        $this->assertTrue($container->isSingleton('test'));
+
+        // Should be false the first time as we haven't called the singleton yet.
+        $this->assertFalse($container->hasBeenResolved('test'));
+        $this->assertSame($testObj, $container->get('test'));
+
+        // Now it should be true as we attempted to retrieve the singleton with $container->get().
+        $this->assertTrue($container->hasBeenResolved('test'));
+    }
 }
