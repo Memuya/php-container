@@ -19,7 +19,7 @@ final class ContainerTest extends TestCase
         $this->assertNotSame($container->get('obj'), $container->get('obj'));
 
         $this->assertFalse($container->isSingleton('obj'));
-        $this->assertSame(get_class($object), get_class($container->get('obj')));
+        $this->assertSame($object::class, $container->get('obj')::class);
     }
 
     public function testCanBindPrimivitesToContainer(): void
