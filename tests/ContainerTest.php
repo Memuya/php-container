@@ -11,12 +11,15 @@ final class ContainerTest extends TestCase
     public function testCanBindObjectToContainer(): void
     {
         $object = new \stdClass;
-        $object->prop = 'test';
-
         $container = new Container;
-        $container->bind('obj', fn () => $object);
+        $container->bind('obj', fn () => new \stdClass);
 
-        $this->assertSame($object, $container->get('obj'));
+        // Retrieving a bound object should create a new instnce everytime so calling
+        // ->get() twice on the same ID should result in different object instances.
+        $this->assertNotSame($container->get('obj'), $container->get('obj'));
+
+        $this->assertFalse($container->isSingleton('obj'));
+        $this->assertSame(get_class($object), get_class($container->get('obj')));
     }
 
     public function testCanBindPrimivitesToContainer(): void
@@ -119,19 +122,10 @@ final class ContainerTest extends TestCase
 
     public function testCanBindAndResolveSingletonsFromContainer()
     {
-        $testObj = new stdClass;
-        $testObj->prop = 'test';
-
         $container = new Container;
-        $container->singleton('test', fn () => $testObj);
-
+        $container->singleton('test', fn () => new \stdClass);
+        
         $this->assertTrue($container->isSingleton('test'));
-
-        // Should be false the first time as we haven't called the singleton yet.
-        $this->assertFalse($container->hasBeenResolved('test'));
-        $this->assertSame($testObj, $container->get('test'));
-
-        // Now it should be true as we attempted to retrieve the singleton with $container->get().
-        $this->assertTrue($container->hasBeenResolved('test'));
+        $this->assertSame($container->get('test'), $container->get('test'));
     }
 }

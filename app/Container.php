@@ -29,13 +29,6 @@ class Container implements ContainerInterface, ArrayAccess
      */
     private array $bindings = [];
 
-    /**
-     * The resolved bindings in the container.
-     *
-     * @var array<mixed>
-     */
-    private array $resolved = [];
-
     public function __construct()
     {
         static::$instance = $this;
@@ -50,17 +43,11 @@ class Container implements ContainerInterface, ArrayAccess
             throw new NotFoundException("'{$id}' not found in container");
         }
 
-        if ($this->isSingleton($id) && $this->hasBeenResolved($id)) {
-            return $this->getResolvedBinding($id);
+        if ($this->isSingleton($id)) {
+            return $this->bindings[$id]['binding'];
         }
 
-        $binding = $this->bindings[$id]['callable']($this);
-
-        if ($this->isSingleton($id) && ! $this->hasBeenResolved($id)) {
-            $this->registerResolvedBinding($id, $binding);
-        }
-
-        return $binding;
+        return $this->bindings[$id]['binding']($this);
     }
 
     /**
@@ -95,13 +82,13 @@ class Container implements ContainerInterface, ArrayAccess
     public function bind(string $id, callable $callable): void
     {
         $this->bindings[$id] = [
-            'callable' => $callable,
+            'binding' => $callable,
             'singleton' => self::IS_NOT_SINGLETON,
         ];
     }
     
     /**
-     * Bind a singleton to the container.
+     * Bind a singleton to the container. This will resolve the binding right away.
      *
      * @param string $id
      * @param callable $callable
@@ -110,7 +97,7 @@ class Container implements ContainerInterface, ArrayAccess
     public function singleton(string $id, callable $callable): void
     {
         $this->bindings[$id] = [
-            'callable' => $callable,
+            'binding' => $callable($this),
             'singleton' => self::IS_SINGLETON,
         ];
     }
@@ -124,40 +111,6 @@ class Container implements ContainerInterface, ArrayAccess
     public function isSingleton(string $id): bool
     {
         return $this->bindings[$id]['singleton'] === self::IS_SINGLETON;
-    }
-
-    /**
-     * Check if the given ID has already been resolved from the container.
-     *
-     * @param string $id
-     * @return boolean
-     */
-    public function hasBeenResolved(string $id): bool
-    {
-        return isset($this->resolved[$id]);
-    }
-
-    /**
-     * Add an already resolved binding to the 'resolved' list.
-     *
-     * @param string $id
-     * @param mixed $binding
-     * @return void
-     */
-    public function registerResolvedBinding(string $id, mixed $binding): void
-    {
-        $this->resolved[$id] = $binding;
-    }
-
-    /**
-     * Return an already resolved binding.
-     *
-     * @param string $id
-     * @return mixed
-     */
-    public function getResolvedBinding(string $id): mixed
-    {
-        return $this->resolved[$id];
     }
 
     /**
