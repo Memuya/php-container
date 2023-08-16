@@ -5,6 +5,7 @@ namespace Memuya;
 use Closure;
 use ArrayAccess;
 use ReflectionClass;
+use Memuya\BindingType;
 use ReflectionParameter;
 use ReflectionUnionType;
 use Memuya\NotFoundException;
@@ -12,9 +13,6 @@ use Psr\Container\ContainerInterface;
 
 class Container implements ContainerInterface, ArrayAccess
 {
-    public const IS_SINGLETON = true;
-    public const IS_NOT_SINGLETON = false;
-    
     /**
      * The Container instance.
      *
@@ -83,7 +81,7 @@ class Container implements ContainerInterface, ArrayAccess
     {
         $this->bindings[$id] = [
             'binding' => $callable,
-            'singleton' => self::IS_NOT_SINGLETON,
+            'type' => BindingType::NORMAL,
         ];
     }
     
@@ -98,7 +96,7 @@ class Container implements ContainerInterface, ArrayAccess
     {
         $this->bindings[$id] = [
             'binding' => $callable($this),
-            'singleton' => self::IS_SINGLETON,
+            'type' => BindingType::SINGLETON,
         ];
     }
 
@@ -115,7 +113,7 @@ class Container implements ContainerInterface, ArrayAccess
             throw new NotFoundException("'{$id}' not found in container");
         }
 
-        return $this->bindings[$id]['singleton'] === self::IS_SINGLETON;
+        return $this->bindings[$id]['type'] === BindingType::SINGLETON;
     }
 
     /**
