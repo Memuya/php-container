@@ -105,11 +105,16 @@ class Container implements ContainerInterface, ArrayAccess
     /**
      * Check if the given ID was bound as a singleton to the container.
      *
+     * @throws NotFoundException
      * @param string $id
-     * @return boolean
+     * @return bool
      */
     public function isSingleton(string $id): bool
     {
+        if (! $this->has($id)) {
+            throw new NotFoundException("'{$id}' not found in container");
+        }
+
         return $this->bindings[$id]['singleton'] === self::IS_SINGLETON;
     }
 
