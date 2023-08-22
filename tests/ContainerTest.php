@@ -1,7 +1,6 @@
 <?php declare(strict_types=1);
 
-use Memuya\Container;
-use Memuya\ContainerException;
+use Memuya\Container\Container;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;

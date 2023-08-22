@@ -1,15 +1,16 @@
 <?php
 
-namespace Memuya;
+namespace Memuya\Container;
 
 use Closure;
 use ArrayAccess;
 use ReflectionClass;
-use Memuya\BindingType;
 use ReflectionParameter;
 use ReflectionUnionType;
-use Memuya\NotFoundException;
+use Memuya\Container\BindingType;
 use Psr\Container\ContainerInterface;
+use Memuya\Container\Exceptions\NotFoundException;
+use Memuya\Container\Exceptions\ContainerException;
 
 class Container implements ContainerInterface, ArrayAccess
 {

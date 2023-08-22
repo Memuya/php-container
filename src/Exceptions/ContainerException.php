@@ -1,6 +1,6 @@
 <?php
 
-namespace Memuya;
+namespace Memuya\Container\Exceptions;
 
 use Exception;
 use Psr\Container\ContainerExceptionInterface;
