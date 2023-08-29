@@ -1,0 +1,30 @@
+name: Build and test
+
+on:
+  push:
+    branches: ["main"]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Docker Compose
+      uses: docker/compose-action@v2
+      with:
+        compose-file: docker-compose.yml
+
+    - name: Build and create containers
+      run: |
+        docker-compose up -d --build
+
+    - name: Install dependencies
+      run: |
+        docker-compose exec app composer install
+
+    - name: Run PHPUnit
+      run: |
+        docker-compose exec app vendor/bin/phpunit tests/
