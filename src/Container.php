@@ -65,7 +65,7 @@ class Container implements ContainerInterface, ArrayAccess
     public static function getInstance(): static
     {
         if (! isset(static::$instance)) {
-            return new static;
+            return new static();
         }
 
         return static::$instance;
@@ -85,7 +85,7 @@ class Container implements ContainerInterface, ArrayAccess
             'type' => BindingType::NORMAL,
         ];
     }
-    
+
     /**
      * Bind a singleton to the container. This will resolve the binding right away.
      *
