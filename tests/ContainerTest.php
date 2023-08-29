@@ -1,7 +1,8 @@
-<?php declare(strict_types=1);
+<?php
 
-use Memuya\Container;
-use Memuya\ContainerException;
+declare(strict_types=1);
+
+use Memuya\Container\Container;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
@@ -10,13 +11,16 @@ final class ContainerTest extends TestCase
 {
     public function testCanBindObjectToContainer(): void
     {
-        $object = new \stdClass;
-        $object->prop = 'test';
+        $object = new \stdClass();
+        $container = new Container();
+        $container->bind('obj', fn () => new \stdClass());
 
-        $container = new Container;
-        $container->bind('obj', fn () => $object);
+        // Retrieving a bound object should create a new instnce everytime so calling
+        // ->get() twice on the same ID should result in different object instances.
+        $this->assertNotSame($container->get('obj'), $container->get('obj'));
 
-        $this->assertSame($object, $container->get('obj'));
+        $this->assertFalse($container->isSingleton('obj'));
+        $this->assertSame($object::class, $container->get('obj')::class);
     }
 
     public function testCanBindPrimivitesToContainer(): void
@@ -25,7 +29,7 @@ final class ContainerTest extends TestCase
         $int = 1;
         $bool = true;
 
-        $container = new Container;
+        $container = new Container();
         $container->bind('string', fn () => $string);
         $container->bind('int', fn () => $int);
         $container->bind('bool', fn () => $bool);
@@ -37,7 +41,7 @@ final class ContainerTest extends TestCase
 
     public function testCanRemoveBindingFromContainer()
     {
-        $container = new Container;
+        $container = new Container();
         $container->bind('id', fn () => 'test');
 
         $this->assertSame('test', $container->get('id'));
@@ -49,11 +53,11 @@ final class ContainerTest extends TestCase
 
     public function testCanMakeFreshObjects()
     {
-        $objectToBuild = new class {
+        $objectToBuild = new class () {
             public string $prop = 'default';
         };
 
-        $container = new Container;
+        $container = new Container();
         $builtObject = $container->make($objectToBuild::class);
 
         $this->assertSame($objectToBuild::class, $builtObject::class);
@@ -62,11 +66,13 @@ final class ContainerTest extends TestCase
 
     public function testCanMakeFreshObjectsAndPassArgumentsToIt()
     {
-        $objectToBuild = new class {
-            public function __construct(public string $prop = 'default') {}
+        $objectToBuild = new class () {
+            public function __construct(public string $prop = 'default')
+            {
+            }
         };
 
-        $container = new Container;
+        $container = new Container();
         $builtObject = $container->make(
             $objectToBuild::class,
             ['prop' => 'override']
@@ -78,7 +84,7 @@ final class ContainerTest extends TestCase
 
     public function testCreatedObjectsPerfersBindedValueOverDefaultParameterValue()
     {
-        $objectToBuild = new class {
+        $objectToBuild = new class () {
             public string $prop;
 
             public function __construct(string $prop = 'default')
@@ -86,8 +92,8 @@ final class ContainerTest extends TestCase
                 $this->prop = $prop;
             }
         };
-        
-        $container = new Container;
+
+        $container = new Container();
         $container->bind('prop', fn () => 'test');
         $builtObject = $container->make($objectToBuild::class);
 
@@ -99,13 +105,13 @@ final class ContainerTest extends TestCase
     {
         $this->expectException(NotFoundExceptionInterface::class);
 
-        $container = new Container;
+        $container = new Container();
         $container->get('unknown');
     }
 
     public function testContainerCanBeUsedAsArray()
     {
-        $container = new Container;
+        $container = new Container();
         $container['id'] = 'test';
 
         $this->assertInstanceOf(ContainerInterface::class, $container);
@@ -115,5 +121,14 @@ final class ContainerTest extends TestCase
         unset($container['id']);
 
         $this->assertFalse(isset($container['id']));
+    }
+
+    public function testCanBindAndResolveSingletonsFromContainer()
+    {
+        $container = new Container();
+        $container->singleton('test', fn () => new \stdClass());
+
+        $this->assertTrue($container->isSingleton('test'));
+        $this->assertSame($container->get('test'), $container->get('test'));
     }
 }

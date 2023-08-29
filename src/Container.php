@@ -1,14 +1,16 @@
 <?php
 
-namespace Memuya;
+namespace Memuya\Container;
 
 use Closure;
 use ArrayAccess;
 use ReflectionClass;
 use ReflectionParameter;
 use ReflectionUnionType;
-use Memuya\NotFoundException;
+use Memuya\Container\BindingType;
 use Psr\Container\ContainerInterface;
+use Memuya\Container\Exceptions\NotFoundException;
+use Memuya\Container\Exceptions\ContainerException;
 
 class Container implements ContainerInterface, ArrayAccess
 {
@@ -22,7 +24,7 @@ class Container implements ContainerInterface, ArrayAccess
     /**
      * The bindings in the container.
      *
-     * @var array<string, callable>
+     * @var array<string, array<string, callable|mixed>>
      */
     private array $bindings = [];
 
@@ -40,7 +42,11 @@ class Container implements ContainerInterface, ArrayAccess
             throw new NotFoundException("'{$id}' not found in container");
         }
 
-        return $this->bindings[$id]($this);
+        if ($this->isSingleton($id)) {
+            return $this->bindings[$id]['binding'];
+        }
+
+        return $this->bindings[$id]['binding']($this);
     }
 
     /**
@@ -59,7 +65,7 @@ class Container implements ContainerInterface, ArrayAccess
     public static function getInstance(): static
     {
         if (! isset(static::$instance)) {
-            return new static;
+            return new static();
         }
 
         return static::$instance;
@@ -74,7 +80,41 @@ class Container implements ContainerInterface, ArrayAccess
      */
     public function bind(string $id, callable $callable): void
     {
-        $this->bindings[$id] = $callable;
+        $this->bindings[$id] = [
+            'binding' => $callable,
+            'type' => BindingType::NORMAL,
+        ];
+    }
+
+    /**
+     * Bind a singleton to the container. This will resolve the binding right away.
+     *
+     * @param string $id
+     * @param callable $callable
+     * @return void
+     */
+    public function singleton(string $id, callable $callable): void
+    {
+        $this->bindings[$id] = [
+            'binding' => $callable($this),
+            'type' => BindingType::SINGLETON,
+        ];
+    }
+
+    /**
+     * Check if the given ID was bound as a singleton to the container.
+     *
+     * @throws NotFoundException
+     * @param string $id
+     * @return bool
+     */
+    public function isSingleton(string $id): bool
+    {
+        if (! $this->has($id)) {
+            throw new NotFoundException("'{$id}' not found in container");
+        }
+
+        return $this->bindings[$id]['type'] === BindingType::SINGLETON;
     }
 
     /**
