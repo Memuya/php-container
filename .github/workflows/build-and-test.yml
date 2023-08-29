@@ -14,8 +14,6 @@ jobs:
 
     - name: Set up Docker Compose
       uses: isbang/compose-action@v1.5.1
-      with:
-        compose-file: docker-compose.yml
 
     - name: Build and create containers
       run: |
@@ -23,7 +21,7 @@ jobs:
 
     - name: Install dependencies
       run: |
-        docker-compose exec app composer install
+        docker-compose exec -T app composer install
 
     - name: Run PHPUnit
       run: |
