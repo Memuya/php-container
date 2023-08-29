@@ -25,4 +25,4 @@ jobs:
 
     - name: Run PHPUnit
       run: |
-        docker-compose exec app vendor/bin/phpunit tests/
+        docker-compose exec -T app vendor/bin/phpunit tests/
