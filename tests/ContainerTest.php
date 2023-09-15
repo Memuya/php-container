@@ -131,4 +131,14 @@ final class ContainerTest extends TestCase
         $this->assertTrue($container->isSingleton('test'));
         $this->assertSame($container->get('test'), $container->get('test'));
     }
+
+    public function testCanBindResolveAnAliasToAnExistingBinding()
+    {
+        $container = new Container();
+        $container->bind('original', fn () => 'test');
+        $container->alias('original', 'changed');
+
+        $this->assertSame('test', $container->get('changed'));
+        $this->assertSame('test', $container->get('original'));
+    }
 }

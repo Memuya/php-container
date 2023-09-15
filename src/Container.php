@@ -24,9 +24,16 @@ class Container implements ContainerInterface, ArrayAccess
     /**
      * The bindings in the container.
      *
-     * @var array<string, array<string, callable|mixed>>
+     * @var array<string,array<string,callable|mixed>>
      */
     private array $bindings = [];
+
+    /**
+     * Alias list for current bindings in the container.
+     *
+     * @var array<string,array>
+     */
+    private array $aliases = [];
 
     public function __construct()
     {
@@ -46,7 +53,7 @@ class Container implements ContainerInterface, ArrayAccess
             return $this->bindings[$id]['binding'];
         }
 
-        return $this->bindings[$id]['binding']($this);
+        return $this->resolveBinding($id);
     }
 
     /**
@@ -54,7 +61,7 @@ class Container implements ContainerInterface, ArrayAccess
      */
     public function has(string $id): bool
     {
-        return isset($this->bindings[$id]);
+        return isset($this->bindings[$id]) || isset($this->aliases[$id]);
     }
 
     /**
@@ -102,6 +109,18 @@ class Container implements ContainerInterface, ArrayAccess
     }
 
     /**
+     * Add an alias to an existing binding.
+     *
+     * @param string $bindingId
+     * @param string $alias
+     * @return void
+     */
+    public function alias(string $bindingId, string $alias): void
+    {
+        $this->aliases[$alias] = $bindingId;
+    }
+
+    /**
      * Check if the given ID was bound as a singleton to the container.
      *
      * @throws NotFoundException
@@ -114,7 +133,7 @@ class Container implements ContainerInterface, ArrayAccess
             throw new NotFoundException("'{$id}' not found in container");
         }
 
-        return $this->bindings[$id]['type'] === BindingType::SINGLETON;
+        return $this->bindings[$this->resolveBindingId($id)]['type'] === BindingType::SINGLETON;
     }
 
     /**
@@ -208,6 +227,22 @@ class Container implements ContainerInterface, ArrayAccess
         }
 
         return $dependency;
+    }
+
+    private function resolveBinding(string $id): mixed
+    {
+        return $this->bindings[$this->resolveBindingId($id)]['binding']($this);
+    }
+
+    /**
+     * Return the associated binding ID, considering any aliases.
+     *
+     * @param string $id
+     * @return string
+     */
+    private function resolveBindingId(string $id): string
+    {
+        return $this->aliases[$id] ?? $id;
     }
 
     /**
