@@ -12,14 +12,17 @@ use Psr\Container\ContainerInterface;
 use Memuya\Container\Exceptions\NotFoundException;
 use Memuya\Container\Exceptions\ContainerException;
 
-class Container implements ContainerInterface, ArrayAccess
+/**
+ * @implements \ArrayAccess<string, mixed>
+ */
+final class Container implements ContainerInterface, ArrayAccess
 {
     /**
      * The Container instance.
      *
-     * @var ContainerInterface
+     * @var Container
      */
-    private static ContainerInterface $instance;
+    private static Container $instance;
 
     /**
      * The bindings in the container.
@@ -131,8 +134,9 @@ class Container implements ContainerInterface, ArrayAccess
     /**
      * Construct a new object and resolve its dependencies.
      *
+     * @template T
      * @throws ContainerException
-     * @param string $object  The name of the object
+     * @param class-string<T> $object  The name of the object
      * @param array<string, mixed> $arguments  Arguments to pass into the object's constructor
      * @return mixed
      */
@@ -156,7 +160,7 @@ class Container implements ContainerInterface, ArrayAccess
      * @throws ContainerException
      * @param ReflectionClass $reflection
      * @param array<string, mixed> $arguments
-     * @return array
+     * @return array<int, string>
      */
     private function resolveDependencies(ReflectionClass $reflection, array $arguments = []): array
     {
@@ -211,7 +215,9 @@ class Container implements ContainerInterface, ArrayAccess
     }
 
     /**
-     * @inheritDoc
+     * @template T
+     * @param T $offset
+     * @return bool
      */
     public function offsetExists(mixed $offset): bool
     {
@@ -219,7 +225,9 @@ class Container implements ContainerInterface, ArrayAccess
     }
 
     /**
-     * @inheritDoc
+     * @template T
+     * @param T $offset
+     * @return mixed
      */
     public function offsetGet(mixed $offset): mixed
     {
@@ -227,7 +235,11 @@ class Container implements ContainerInterface, ArrayAccess
     }
 
     /**
-     * @inheritDoc
+     * @template T
+     * @template V
+     * @param T $offset
+     * @param V $value
+     * @return void
      */
     public function offsetSet(mixed $offset, mixed $value): void
     {
@@ -238,7 +250,9 @@ class Container implements ContainerInterface, ArrayAccess
     }
 
     /**
-     * @inheritDoc
+     * @template T
+     * @param T $offset
+     * @return void
      */
     public function offsetUnset(mixed $offset): void
     {
