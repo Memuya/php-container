@@ -34,7 +34,7 @@ final class Container implements ContainerInterface, ArrayAccess
     /**
      * Alias list for current bindings in the container.
      *
-     * @var array<string,array>
+     * @var array<string,string>
      */
     private array $aliases = [];
 
