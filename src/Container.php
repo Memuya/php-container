@@ -156,7 +156,7 @@ final class Container implements ContainerInterface, ArrayAccess
      * @template T
      * @throws ContainerException
      * @param class-string<T> $object  The name of the object
-     * @param array<string, mixed> $arguments  Arguments to pass into the object's constructor
+     * @param array<string,mixed> $arguments  Arguments to pass into the object's constructor
      * @return mixed
      */
     public function make(string $object, array $arguments = []): mixed
@@ -178,8 +178,8 @@ final class Container implements ContainerInterface, ArrayAccess
      *
      * @throws ContainerException
      * @param ReflectionClass $reflection
-     * @param array<string, mixed> $arguments
-     * @return array<int, string>
+     * @param array<string,mixed> $arguments
+     * @return array<int,string>
      */
     private function resolveDependencies(ReflectionClass $reflection, array $arguments = []): array
     {
