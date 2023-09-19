@@ -234,6 +234,12 @@ final class Container implements ContainerInterface, ArrayAccess
         return $dependency;
     }
 
+    /**
+     * Resolve a binding from the container.
+     *
+     * @param string $id
+     * @return mixed
+     */
     private function resolveBinding(string $id): mixed
     {
         return $this->bindings[$this->resolveBindingId($id)]['binding']($this);
