@@ -11,6 +11,7 @@ use Memuya\Container\BindingType;
 use Psr\Container\ContainerInterface;
 use Memuya\Container\Exceptions\NotFoundException;
 use Memuya\Container\Exceptions\ContainerException;
+use ReflectionNamedType;
 
 /**
  * @implements \ArrayAccess<string, mixed>
@@ -199,11 +200,11 @@ final class Container implements ContainerInterface, ArrayAccess
                     return $arguments[$parameterName];
                 }
 
-                if ($parameterType instanceof ReflectionUnionType) {
-                    throw new ContainerException("Could not resolve argument '{$parameterName}' on '{$reflection->getName()}' as it is a union type.");
+                if (! $parameterType instanceof ReflectionNamedType) {
+                    throw new ContainerException("Could not resolve argument '{$parameterName}' on '{$reflection->getName()}' as it is not a named type.");
                 }
 
-                return $parameterType === null || $parameterType->isBuiltin()
+                return $parameterType->isBuiltin()
                     ? $this->resolveDependency($parameter)
                     : $this->make($parameterType->getName());
             },
