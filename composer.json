@@ -23,5 +23,9 @@
     },
     "require": {
         "psr/container": "^2.0"
+    },
+    "scripts": {
+        "test": "./vendor/bin/phpunit tests/ --testdox",
+        "sa": "./vendor/bin/phpstan analyse src/"
     }
 }
