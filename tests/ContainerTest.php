@@ -132,13 +132,27 @@ final class ContainerTest extends TestCase
         $this->assertSame($container->get('test'), $container->get('test'));
     }
 
-    public function testCanBindResolveAnAliasToAnExistingBinding()
+    public function testCanBindAndResolveAnAliasToAnExistingBinding()
     {
+        $value = 'test';
         $container = new Container();
-        $container->bind('original', fn () => 'test');
+        $container->bind('original', fn () => $value);
         $container->alias('original', 'changed');
 
-        $this->assertSame('test', $container->get('changed'));
-        $this->assertSame('test', $container->get('original'));
+        $this->assertSame($value, $container->get('changed'));
+        $this->assertSame($value, $container->get('original'));
+    }
+
+    public function testCanAddMultipleAliasesToASingleBinding()
+    {
+        $value = 'test';
+        $container = new Container();
+        $container->bind('original', fn () => $value);
+        $container->alias('original', 'changed');
+        $container->alias('original', 'changed_two');
+
+        $this->assertSame($value, $container->get('changed'));
+        $this->assertSame($value, $container->get('changed_two'));
+        $this->assertSame($value, $container->get('original'));
     }
 }
