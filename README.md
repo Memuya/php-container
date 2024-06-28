@@ -31,6 +31,8 @@ $container->bind('key', fn (): string => 'Hello, world!');
 $container->bind('someObject', function (): \stdClass {
   $object = new \stdClass();
   $object->name = 'Bob';
+
+  return $object;
 });
 ```
 
@@ -68,6 +70,8 @@ Each time an object is retrieved from the container, it will re-create it fresh.
 $container->singleton('someObject', function (): \stdClass {
   $object = new \stdClass();
   $object->name = 'Bob';
+
+  return $object;
 });
 ```
 This will give you back the exact same object every time as it is resolved when the binding is initiated.
